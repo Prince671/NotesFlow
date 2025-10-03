@@ -42,7 +42,7 @@ function App() {
           }
         />
         <Route
-          path={`${API_BASE}`}
+          path={API_BASE}
           element={
             <ProtectedRoute>
               <Notes />
