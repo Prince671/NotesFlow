@@ -8,11 +8,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 
 function App() {
-
-  const API_BASE = import.meta.env.VITE_API_BASE + "/notes";
-  const API_BASE_SHARED = import.meta.env.VITE_API_BASE + "/notes/shared/:publicId";
   return (
-  
+    
       <Routes>
         {/* Public routes (accessible only if NOT logged in) */}
         <Route
@@ -42,24 +39,7 @@ function App() {
           }
         />
         <Route
-          path={API_BASE}
-          element={
-            <ProtectedRoute>
-              <Notes />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
           path="/notes/shared/:publicId"
-          element={
-            <ProtectedRoute>
-              <SharedNote />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={API_BASE_SHARED}
           element={
             <ProtectedRoute>
               <SharedNote />
