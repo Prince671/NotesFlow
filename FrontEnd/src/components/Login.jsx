@@ -43,6 +43,8 @@ const Login = () => {
     return Object.keys(errors).length === 0;
   };
 
+  const AUTH_BASE = import.meta.env.VITE_API_BASE + "/auth";
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -54,7 +56,7 @@ const Login = () => {
     setLoginLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch(`${AUTH_BASE}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
