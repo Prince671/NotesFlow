@@ -374,30 +374,64 @@ const exportNotes = () => {
   }
 
   const doc = new jsPDF();
+  const pageHeight = doc.internal.pageSize.height; // total page height
+  const marginTop = 20;
+  const lineHeight = 7;
+  const pageWidth = doc.internal.pageSize.width;
+  const textWidth = pageWidth - 20; // 10px margin on both sides
+  let y = marginTop;
 
   notes.forEach((note, index) => {
     const title = note.title || "Untitled";
     const description = note.description || "";
-
-    // Add title
-    doc.setFontSize(16);
-    doc.text(`Title: ${title}`, 10, 20 + index * 50);
-
-    // Add description
-    doc.setFontSize(12);
-    const splitDesc = doc.splitTextToSize(description, 180); // wrap text
-    doc.text(splitDesc, 10, 30 + index * 50);
-
-    // Add tags, priority, date
-    doc.setFontSize(10);
     const tags = note.tags?.join(", ") || "None";
+    const priority = note.priority || "medium";
     const date = note.createdAt ? new Date(note.createdAt).toLocaleDateString() : "Unknown";
-    doc.text(`Tags: ${tags}`, 10, 40 + index * 50);
-    doc.text(`Priority: ${note.priority || "medium"}`, 10, 45 + index * 50);
-    doc.text(`Date: ${date}`, 10, 50 + index * 50);
 
-    // Add a new page for every note except the last
-    if (index !== notes.length - 1) doc.addPage();
+    // --- Title ---
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Title: ${title}`, 10, y);
+    y += lineHeight + 2;
+
+    // --- Description ---
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    const splitDesc = doc.splitTextToSize(description, textWidth);
+    splitDesc.forEach((line) => {
+      if (y + lineHeight > pageHeight - 20) {
+        doc.addPage();
+        y = marginTop;
+      }
+      doc.text(line, 10, y);
+      y += lineHeight;
+    });
+    y += 4;
+
+    // --- Tags / Priority / Date ---
+    const infoLines = [
+      `Tags: ${tags}`,
+      `Priority: ${priority}`,
+      `Date: ${date}`,
+    ];
+    doc.setFontSize(10);
+    infoLines.forEach((line) => {
+      if (y + lineHeight > pageHeight - 20) {
+        doc.addPage();
+        y = marginTop;
+      }
+      doc.text(line, 10, y);
+      y += lineHeight;
+    });
+
+    // --- Add spacing between notes ---
+    y += 10;
+
+    // --- Page break if not enough space for next note ---
+    if (index < notes.length - 1 && y + 40 > pageHeight - 20) {
+      doc.addPage();
+      y = marginTop;
+    }
   });
 
   const fileName = `notes-${new Date().toISOString().split("T")[0]}.pdf`;
